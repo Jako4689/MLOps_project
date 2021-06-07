@@ -56,7 +56,7 @@ class TrainOREvaluate(object):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.SGD(model.parameters(), lr=args.lr,momentum=0.9)
 
-        num_epochs = args.epoch
+        num_epochs = int(args.epoch)
 
         train_losses = np.zeros(num_epochs)
         valid_losses = np.zeros(num_epochs)
@@ -96,6 +96,8 @@ class TrainOREvaluate(object):
                 output = model(valid_images)
                 val_batch_loss = criterion(output,valid_labels)
                 val_loss+=val_batch_loss
+                
+                #Softmax max arg
                 preds = torch.max(output, 1)[1]
 
                 
@@ -138,11 +140,21 @@ class TrainOREvaluate(object):
 
         _, test_set = mnist()
 
+        testloader = torch.utils.data.DataLoader(test_set, batch_size=256, shuffle=False)
+        testiter = iter(testloader)
+
+        test_preds, test_targs = [], []
+        model.eval()
+        for images,labels in testiter:
+            output = model(images)
+
+            #Softmax max arg
+            preds = torch.max(output, 1)[1]
+            test_targs += list(labels.numpy())
+            test_preds += list(preds.data.numpy())
 
 
-
-
-
+        print("Model test accuracy:" , accuracy_score(test_targs, test_preds))
 
 
 if __name__ == '__main__':
