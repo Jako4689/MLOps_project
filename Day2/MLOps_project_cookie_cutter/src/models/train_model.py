@@ -4,6 +4,9 @@ import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torchvision.datasets import MNIST
+from torchvision import transforms
+
 
 import numpy as np
 from tqdm import tqdm
@@ -12,14 +15,18 @@ from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import os 
 
-from src.data import mnist
-from src.models import MyAwesomeModel,Net
+#from src.data import mnist
+from src.models.model import MyAwesomeModel,Net
+
+
 
 class TrainOREvaluate(object):
     """ Helper class that will help launch class methods as commands
         from a single script
     """
     def __init__(self):
+        self.transform =  transforms.Compose([transforms.ToTensor(),])
+
         parser = argparse.ArgumentParser(
             description="Script for either training or evaluating",
             usage="python main.py <command>"
@@ -33,6 +40,8 @@ class TrainOREvaluate(object):
             exit(1)
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
+
+        
     
     def train(self):
         print("Training day and night")
@@ -45,7 +54,7 @@ class TrainOREvaluate(object):
         
         # TODO: Implement training loop here
         
-        train_set, _ = mnist()   
+        train_set = MNIST("./data", train=True, download=False,transform=self.transform) 
         train_set, val_set = torch.utils.data.random_split(train_set, [50000, 10000])
 
         trainloader = torch.utils.data.DataLoader(train_set, batch_size=64, shuffle=True)
@@ -119,7 +128,7 @@ class TrainOREvaluate(object):
         plt.xlabel('Updates'), plt.ylabel('Loss')
         plt.show() 
         plt.savefig('./reports/figures')
-        torch.save(model, "./models/net/net_{}.model".format(len(os.listdir("./models")))) #creates subfolders
+        torch.save(model, "./models/Net/net_{}.model".format(len(os.listdir("models")))) #creates subfolders
 
 
 
@@ -136,9 +145,9 @@ class TrainOREvaluate(object):
         if args.load_model_from:
             model = torch.load(args.load_model_from)
         else:
-            model = torch.load("models/net/net_1.model")
+            model = torch.load("./models/Net/net_1.model")
 
-        _, test_set = mnist()
+        test_set = MNIST("./data", train=False, download=False,transform=self.transform) 
 
         testloader = torch.utils.data.DataLoader(test_set, batch_size=256, shuffle=False)
         testiter = iter(testloader)
