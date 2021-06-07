@@ -30,36 +30,14 @@ def main(process_data):
                                               transforms.Normalize((0.5,), (0.5,)),
                                               ])
 
-    while not Path('./data/test/MNIST').exists():
-        test = MNIST("./data/test", train=False, download=download, transform=transformations)
+    while not Path('./data/MNIST/processed/test.pt').exists():
+        test = MNIST("./data", train=False, download=download, transform=transformations)
         time.sleep(1)
         print("Downloaded Test data")
-    while not Path('./data/train/MNIST').exists():
-        train = MNIST("./data/train", train=True, download=download, transform=transformations)
+    while not Path('./data/MNIST/processed/training.pt').exists():
+        train = MNIST("./data", train=True, download=download, transform=transformations)
         time.sleep(1)
         print("Downloaded Test data")
-
-    my_file = Path('./data/raw/test')
-
-    # Assume all exists
-    to_remove = ['./data' + x for x in ['/raw/test', '/processed/test', '/processed/train', '/raw/train']]
-    if my_file.exists():
-        try:
-            for x in to_remove:
-                shutil.rmtree(x)
-        except FileNotFoundError:
-            print("File not found")
-
-    # Move files
-    shutil.move('./data/test/MNIST/processed', './data/processed/test')
-    shutil.move('./data/test/MNIST/raw', './data/raw/test')
-
-    shutil.move('./data/train/MNIST/processed', './data/processed/train')
-    shutil.move('./data/train/MNIST/raw', './data/raw/train')
-
-    # Cleanup
-    shutil.rmtree('./data/train')
-    shutil.rmtree('./data/test')
 
 
 if __name__ == '__main__':
