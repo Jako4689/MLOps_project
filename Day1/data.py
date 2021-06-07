@@ -14,8 +14,8 @@ def mnist(transform = True):
                               transforms.Normalize((0.5,), (0.5,)),
                               ])
     
-    train = MNIST("./", train=True, download=download,transforms=transformations)
-    test = MNIST("./", train=False, download=download,transforms=transformations)
+    train = MNIST("./", train=True, download=download,transform=transformations)
+    test = MNIST("./", train=False, download=download,transform=transformations)
     
     return train, test
 
