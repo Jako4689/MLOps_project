@@ -104,3 +104,11 @@ class Net(nn.Module):
         x = nn.functional.softmax(self.lineout(x),dim=1)
         
         return x
+
+    def feature_forward(self,x):
+        x = self.conv1(x)
+        x = self.pool1(x)
+        x = x.view(-1,self.l1_in_features)
+        x = nn.functional.relu(self.line1(x))
+
+        return x
